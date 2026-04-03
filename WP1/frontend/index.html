@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Student Manager</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>🎓 Student Manager</h1>
+
+<section>
+    <h2>Ajouter matière</h2>
+    <input id="name" placeholder="Nom">
+    <input id="coef" placeholder="Coef">
+    <button onclick="addSubject()">Ajouter</button>
+</section>
+
+<section>
+    <h2>Ajouter note</h2>
+    <input id="subject_id" placeholder="ID matière">
+    <input id="grade" placeholder="Note">
+    <button onclick="addGrade()">Ajouter</button>
+</section>
+
+<section>
+    <h2>Moyenne</h2>
+    <button onclick="getAverage()">Calculer</button>
+    <p id="result"></p>
+</section>
+
+<script>
+const API = "http://127.0.0.1:5000";
+
+// Ajouter matière
+async function addSubject() {
+    const name = document.getElementById("name").value;
+    const coef = parseInt(document.getElementById("coef").value);
+
+    if (!name || !coef) {
+        alert("Remplis tous les champs");
+        return;
+    }
+
+    const res = await fetch(`${API}/subjects`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ name, coef })
+    });
+
+    const data = await res.json();
+    document.getElementById("result").innerText = data.message;
+}
+
+// Ajouter note
+async function addGrade() {
+    const subject_id = parseInt(document.getElementById("subject_id").value);
+    const grade = parseFloat(document.getElementById("grade").value);
+
+    if (grade < 0 || grade > 20) {
+        alert("La note doit être entre 0 et 20");
+        return;
+    }
+
+    const res = await fetch(`${API}/grades`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ subject_id, grade })
+    });
+
+    const data = await res.json();
+    document.getElementById("result").innerText = data.message;
+}
+
+// Moyenne
+async function getAverage() {
+    const res = await fetch(`${API}/average`);
+    const data = await res.json();
+
+    document.getElementById("result").innerText =
+        "Moyenne : " + data.average;
+}
+</script>
+
+</body>
+</html>
